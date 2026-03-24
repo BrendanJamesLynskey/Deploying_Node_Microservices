@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploying Node.js Microservices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<style>
+  :root {
+    --amber:  #f5a623;
+    --green:  #4ecb8d;
+    --purple: #a78bfa;
+    --blue:   #60a5fa;
+    --red:    #f87171;
+    --bg:     #0a0a0f;
+    --bg2:    #10101a;
+    --bg3:    #181824;
+    --border: #2a2a3a;
+    --text:   #e8e8f0;
+    --muted:  #8888a8;
+  }
+
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section { background: transparent; }
+
+  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
+  .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
+  .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
+  .reveal p  { font-size: .56em; line-height: 1.45; color: var(--text); }
+  .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
+  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
+                 border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+
+  .slide-hdr {
+    display: flex; align-items: center; gap: .4em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .2em; margin-bottom: .3em;
+  }
+  .slide-hdr .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .42em; font-weight: 500;
+    color: var(--bg); background: var(--amber);
+    padding: .1em .4em; border-radius: 3px;
+    letter-spacing: .04em;
+  }
+  .slide-hdr h2 { margin: 0; font-size: .95em; }
+
+  .cols   { display: grid; gap: .5em; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-6040 { grid-template-columns: 6fr 4fr; }
+  .cols-4060 { grid-template-columns: 4fr 6fr; }
+
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: .35em .6em;
+  }
+  .card.amber { border-left: 3px solid var(--amber); }
+  .card.green { border-left: 3px solid var(--green); }
+  .card.purple{ border-left: 3px solid var(--purple); }
+  .card.blue  { border-left: 3px solid var(--blue); }
+  .card.red   { border-left: 3px solid var(--red); }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; }
+  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card ul { margin: 0; padding-left: 1em; }
+  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+
+  .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
+  .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
+                     padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
+  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+
+  .a  { color: var(--amber); font-weight: 600; }
+  .g  { color: var(--green); font-weight: 600; }
+  .p  { color: var(--purple); font-weight: 600; }
+  .b  { color: var(--blue); font-weight: 600; }
+  .r  { color: var(--red); font-weight: 600; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  svg.diagram { display: block; margin: 0 auto; overflow: visible; }
+
+  .pill {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: .44em; padding: .08em .4em; border-radius: 99px;
+    border: 1px solid; margin: 0 .08em;
+  }
+  .pill.amber { color: var(--amber); border-color: var(--amber); }
+  .pill.green { color: var(--green); border-color: var(--green); }
+  .pill.purple{ color: var(--purple); border-color: var(--purple); }
+  .pill.blue  { color: var(--blue); border-color: var(--blue); }
+
+  .reveal .slide-footer { display: none; }
+  .title-slide h1 { font-size: 1.8em; }
+  .title-slide .subtitle {
+    font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em;
+  }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .ss-row {
+    display: flex; gap: .25em; align-items: center;
+    margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace;
+  }
+  .ss-node {
+    padding: .2em .55em; border-radius: 5px; font-size: .9em;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  }
+  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
+  .ss-node.done   { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-arrow { color: var(--amber); }
+  .ss-label { font-size: .8em; color: var(--muted); margin-left: .3em; }
+
+  .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
+  .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============== SLIDE 1: TITLE ============== -->
+<section data-background-color="#0a0a0f" class="title-slide">
+  <h1>Deploying Node.js Microservices</h1>
+  <div class="subtitle">From localhost to production-grade distributed systems</div>
+  <div style="margin: .3em 0;">
+    <span class="pill amber">Node.js</span>
+    <span class="pill green">Microservices</span>
+    <span class="pill purple">DevOps</span>
+  </div>
+  <div class="ss-row" style="justify-content: center; margin-top: .5em;">
+    <span class="ss-node done">Design</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node done">Build</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node active">Containerise</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node">Deploy</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node">Monitor</span>
+  </div>
+  <div class="meta" style="margin-top: .6em;">22 slides &middot; architecture &middot; containers &middot; orchestration &middot; observability</div>
+</section>
+
+<!-- ============== SLIDE 2: AGENDA ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">00</span>
+    <h2>Topics We'll Cover</h2>
+  </div>
+  <div class="cols cols-2">
+    <div class="card amber">
+      <h3>Part 1 &mdash; Architecture &amp; Code</h3>
+      <ul>
+        <li>Monolith vs Microservices</li>
+        <li>Anatomy of a Node.js microservice</li>
+        <li>Project structure (mono/polyrepo)</li>
+        <li>Health checks &amp; readiness probes</li>
+        <li>Graceful shutdown patterns</li>
+        <li>Environment configuration</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>Part 2 &mdash; Containers &amp; Networking</h3>
+      <ul>
+        <li>Production Dockerfiles (multi-stage)</li>
+        <li>Docker Compose for local dev</li>
+        <li>Inter-service communication</li>
+        <li>Message queues &amp; event-driven arch</li>
+        <li>API Gateway pattern</li>
+        <li>Service discovery &amp; load balancing</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>Part 3 &mdash; Security &amp; Observability</h3>
+      <ul>
+        <li>Service-to-service authentication</li>
+        <li>Logging &amp; correlation IDs</li>
+        <li>Database-per-service pattern</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>Part 4 &mdash; Deployment &amp; Operations</h3>
+      <ul>
+        <li>Deploying to Kubernetes</li>
+        <li>Deploying to AWS (ECS/Fargate/Lambda)</li>
+        <li>CI/CD pipelines for microservices</li>
+        <li>Common pitfalls &amp; production lessons</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 3: MONOLITH VS MICROSERVICES ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">01</span>
+    <h2>Monolith vs Microservices</h2>
+  </div>
+  <div class="cols cols-2">
+    <div class="card amber">
+      <h3>When to Stay Monolithic</h3>
+      <ul>
+        <li>Small team (&lt; 5 developers)</li>
+        <li>Unclear domain boundaries</li>
+        <li>Rapid prototyping / MVP phase</li>
+        <li>Low traffic, simple scaling needs</li>
+      </ul>
+      <p style="margin-top: .2em;"><span class="a">Rule:</span> Start monolithic, extract when pain points emerge</p>
+    </div>
+    <div class="card green">
+      <h3>When to Split</h3>
+      <ul>
+        <li>Independent deploy cadences needed</li>
+        <li>Different scaling profiles per domain</li>
+        <li>Multiple teams owning distinct features</li>
+        <li>Technology diversity requirements</li>
+      </ul>
+      <p style="margin-top: .2em;"><span class="g">Goal:</span> Organisational autonomy + independent deployability</p>
+    </div>
+  </div>
+  <svg class="diagram" width="950" height="220" viewBox="0 0 950 220">
+    <!-- Monolith -->
+    <rect x="20" y="20" width="200" height="180" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
+    <text x="120" y="50" text-anchor="middle" fill="#f5a623" font-family="Playfair Display" font-size="14" font-weight="700">Monolith</text>
+    <rect x="40" y="65" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
+    <text x="120" y="82" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Users Module</text>
+    <rect x="40" y="98" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
+    <text x="120" y="115" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Orders Module</text>
+    <rect x="40" y="131" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
+    <text x="120" y="148" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Payments Module</text>
+    <rect x="40" y="164" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
+    <text x="120" y="181" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Shared Database</text>
+    <!-- Arrow -->
+    <text x="310" y="115" fill="#f5a623" font-size="32">&#8594;</text>
+    <!-- Microservices -->
+    <rect x="400" y="10" width="155" height="70" rx="8" fill="#10101a" stroke="#4ecb8d" stroke-width="2"/>
+    <text x="477" y="35" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">user-service</text>
+    <rect x="415" y="48" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
+    <text x="477" y="62" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+    <rect x="400" y="90" width="155" height="70" rx="8" fill="#10101a" stroke="#60a5fa" stroke-width="2"/>
+    <text x="477" y="115" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11">order-service</text>
+    <rect x="415" y="128" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
+    <text x="477" y="142" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">MongoDB</text>
+    <rect x="400" y="170" width="155" height="70" rx="8" fill="#10101a" stroke="#a78bfa" stroke-width="2"/>
+    <text x="477" y="195" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="11">payment-service</text>
+    <rect x="415" y="208" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
+    <text x="477" y="222" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+    <!-- Message Bus -->
+    <rect x="620" y="80" width="155" height="55" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
+    <text x="697" y="103" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">Message Bus</text>
+    <text x="697" y="122" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">RabbitMQ / NATS</text>
+    <!-- Connecting lines -->
+    <line x1="555" y1="45" x2="620" y2="100" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
+    <line x1="555" y1="125" x2="620" y2="107" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
+    <line x1="555" y1="205" x2="620" y2="115" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
+    <!-- API Gateway -->
+    <rect x="620" y="160" width="155" height="45" rx="8" fill="#10101a" stroke="#4ecb8d" stroke-width="1"/>
+    <text x="697" y="187" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">API Gateway</text>
+  </svg>
+</section>
+
+<!-- ============== SLIDE 4: ANATOMY OF A NODE.JS MICROSERVICE ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">02</span>
+    <h2>Anatomy of a Node.js Microservice</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-typescript">// src/server.ts — Entry point
+import Fastify from 'fastify';
+import { healthRoutes } from './routes/health.js';
+import { userRoutes } from './routes/users.js';
+import { gracefulShutdown } from './lifecycle.js';
+import { config } from './config.js';
+
+const app = Fastify({
+  logger: {
+    level: config.LOG_LEVEL,
+    transport: config.NODE_ENV === 'development'
+      ? { target: 'pino-pretty' }
+      : undefined,
+  },
+});
+
+// Register routes
+app.register(healthRoutes, { prefix: '/' });
+app.register(userRoutes,   { prefix: '/api/users' });
+
+// Start
+const start = async () =&gt; {
+  await app.listen({
+    port: config.PORT,
+    host: '0.0.0.0',    // bind all interfaces in Docker
+  });
+  app.log.info(`Service running on :${config.PORT}`);
+};
+
+start();
+gracefulShutdown(app);</code></pre>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Key Principles</h3>
+        <ul>
+          <li><span class="g">Single responsibility</span> &mdash; one bounded context per service</li>
+          <li><span class="g">Bind to 0.0.0.0</span> &mdash; required for container networking</li>
+          <li><span class="g">Structured logging</span> &mdash; JSON via pino (built into Fastify)</li>
+          <li><span class="g">Health endpoints</span> &mdash; K8s liveness &amp; readiness probes</li>
+          <li><span class="g">Graceful shutdown</span> &mdash; drain in-flight requests on SIGTERM</li>
+        </ul>
+      </div>
+      <div class="card amber">
+        <h3>Fastify vs Express</h3>
+        <ul>
+          <li>Fastify: <span class="a">~77k req/s</span>, schema validation, built-in logging</li>
+          <li>Express: <span class="a">~15k req/s</span>, massive ecosystem, simpler mental model</li>
+          <li>Both work &mdash; Fastify is preferred for high-throughput microservices</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 5: PROJECT STRUCTURE ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">03</span>
+    <h2>Structuring a Node.js Project for Microservices</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Monorepo (Recommended for Most Teams)</h3>
+        <pre><code class="language-bash">platform/
+├── packages/
+│   ├── shared-types/        # Shared TS interfaces
+│   ├── logger/              # Shared pino config
+│   └── auth-middleware/     # JWT validation
+├── services/
+│   ├── user-service/
+│   │   ├── src/
+│   │   │   ├── server.ts
+│   │   │   ├── config.ts
+│   │   │   ├── routes/
+│   │   │   ├── services/
+│   │   │   └── repositories/
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   ├── order-service/
+│   └── payment-service/
+├── docker-compose.yml
+├── turbo.json               # Turborepo config
+└── package.json             # Workspace root</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Monorepo Pros</h3>
+        <ul>
+          <li>Atomic cross-service changes in one PR</li>
+          <li>Shared packages without npm publishing</li>
+          <li>Unified CI/CD and tooling config</li>
+          <li>Easier refactoring across boundaries</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-bottom: .3em;">
+        <h3>Polyrepo Pros</h3>
+        <ul>
+          <li>Complete team autonomy</li>
+          <li>Independent versioning &amp; release cycles</li>
+          <li>Smaller clone / CI scope per service</li>
+          <li>Better for large orgs with distinct ownership</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>Tooling</h3>
+        <ul>
+          <li><span class="b">Turborepo</span> &mdash; fast, caches build artifacts</li>
+          <li><span class="b">Nx</span> &mdash; more features, steeper learning curve</li>
+          <li><span class="b">pnpm workspaces</span> &mdash; lightweight, fast installs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 6: HEALTH CHECKS ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">04</span>
+    <h2>Health Checks &amp; Readiness Probes</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-typescript">// src/routes/health.ts
+import { FastifyInstance } from 'fastify';
+import { pool } from '../db.js';
+import { redis } from '../redis.js';
+
+export async function healthRoutes(app: FastifyInstance) {
+  // Liveness — is the process alive?
+  app.get('/health', async (_req, reply) =&gt; {
+    return reply.send({ status: 'ok', uptime: process.uptime() });
+  });
+
+  // Readiness — can it serve traffic?
+  app.get('/ready', async (_req, reply) =&gt; {
+    const checks: Record&lt;string, string&gt; = {};
+
+    try {
+      await pool.query('SELECT 1');
+      checks.postgres = 'ok';
+    } catch {
+      checks.postgres = 'fail';
+    }
+
+    try {
+      await redis.ping();
+      checks.redis = 'ok';
+    } catch {
+      checks.redis = 'fail';
+    }
+
+    const allOk = Object.values(checks)
+      .every(v =&gt; v === 'ok');
+
+    return reply
+      .status(allOk ? 200 : 503)
+      .send({ status: allOk ? 'ready' : 'degraded', checks });
+  });
+}</code></pre>
+    </div>
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>/health (Liveness)</h3>
+        <ul>
+          <li>Returns 200 if process is alive</li>
+          <li>K8s restarts container if this fails</li>
+          <li>Keep it <span class="a">fast</span> &mdash; no DB calls</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>/ready (Readiness)</h3>
+        <ul>
+          <li>Checks <span class="g">all dependencies</span> (DB, Redis, disk)</li>
+          <li>Returns 503 if any check fails</li>
+          <li>K8s removes pod from load balancer</li>
+          <li>Traffic resumes when check passes again</li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <h3>What to Check</h3>
+        <table>
+          <tr><th>Dependency</th><th>Check</th></tr>
+          <tr><td>PostgreSQL</td><td><code>SELECT 1</code></td></tr>
+          <tr><td>Redis</td><td><code>PING</code></td></tr>
+          <tr><td>RabbitMQ</td><td>Channel open</td></tr>
+          <tr><td>Disk</td><td>Write temp file</td></tr>
+          <tr><td>External API</td><td>HEAD request</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 7: GRACEFUL SHUTDOWN ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">05</span>
+    <h2>Graceful Shutdown</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-typescript">// src/lifecycle.ts
+import { FastifyInstance } from 'fastify';
+import { pool } from './db.js';
+import { redis } from './redis.js';
+import { channel } from './mq.js';
+
+const SHUTDOWN_TIMEOUT = 15_000; // 15 seconds
+
+export function gracefulShutdown(app: FastifyInstance) {
+  let shuttingDown = false;
+
+  const shutdown = async (signal: string) =&gt; {
+    if (shuttingDown) return;
+    shuttingDown = true;
+
+    app.log.info({ signal }, 'Shutdown signal received');
+
+    // 1. Stop accepting new connections
+    //    Fastify .close() drains in-flight requests
+    const timer = setTimeout(() =&gt; {
+      app.log.error('Shutdown timed out, forcing exit');
+      process.exit(1);
+    }, SHUTDOWN_TIMEOUT);
+
+    try {
+      // 2. Close HTTP server (drain in-flight)
+      await app.close();
+      app.log.info('HTTP server closed');
+
+      // 3. Close external connections
+      await channel?.close();
+      app.log.info('RabbitMQ channel closed');
+
+      await redis.quit();
+      app.log.info('Redis connection closed');
+
+      await pool.end();
+      app.log.info('PostgreSQL pool closed');
+
+      clearTimeout(timer);
+      app.log.info('Clean shutdown complete');
+      process.exit(0);
+    } catch (err) {
+      app.log.error(err, 'Error during shutdown');
+      process.exit(1);
+    }
+  };
+
+  process.on('SIGTERM', () =&gt; shutdown('SIGTERM'));
+  process.on('SIGINT',  () =&gt; shutdown('SIGINT'));
+}</code></pre>
+    </div>
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Why It Matters</h3>
+        <ul>
+          <li>K8s sends <span class="a">SIGTERM</span> before killing a pod</li>
+          <li>Default grace period: 30 seconds</li>
+          <li>Without handling: dropped requests, corrupt data</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Shutdown Order</h3>
+        <ol>
+          <li>Stop accepting <span class="g">new connections</span></li>
+          <li>Drain <span class="g">in-flight requests</span></li>
+          <li>Close message queue channels</li>
+          <li>Close cache connections (Redis)</li>
+          <li>Close database pools</li>
+          <li>Exit process</li>
+        </ol>
+      </div>
+      <div class="card red">
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>No timeout &mdash; shutdown hangs forever</li>
+          <li>Closing DB before draining HTTP requests</li>
+          <li>Forgetting <code>SIGINT</code> (Ctrl+C in dev)</li>
+          <li>Using <code>process.exit()</code> without cleanup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 8: ENVIRONMENT CONFIGURATION ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">06</span>
+    <h2>Environment Configuration</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-typescript">// src/config.ts — Typed, validated configuration
+import { z } from 'zod';
+import 'dotenv/config';
+
+const envSchema = z.object({
+  NODE_ENV:     z.enum(['development', 'production', 'test'])
+                 .default('development'),
+  PORT:         z.coerce.number().int().default(3000),
+  LOG_LEVEL:    z.enum(['fatal','error','warn','info','debug','trace'])
+                 .default('info'),
+
+  // Database
+  DATABASE_URL: z.string().url()
+    .describe('PostgreSQL connection string'),
+  DB_POOL_MIN:  z.coerce.number().int().default(2),
+  DB_POOL_MAX:  z.coerce.number().int().default(10),
+
+  // Redis
+  REDIS_URL:    z.string().url().default('redis://localhost:6379'),
+
+  // Auth
+  JWT_SECRET:   z.string().min(32),
+  JWT_EXPIRES:  z.string().default('15m'),
+
+  // External services
+  ORDER_SERVICE_URL: z.string().url()
+    .default('http://order-service:3001'),
+});
+
+export type Config = z.infer&lt;typeof envSchema&gt;;
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error('Invalid environment:', parsed.error.format());
+  process.exit(1);
+}
+
+export const config = parsed.data;</code></pre>
+    </div>
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>12-Factor App Config</h3>
+        <ul>
+          <li>Store config in <span class="a">environment variables</span></li>
+          <li>Never commit secrets to source control</li>
+          <li>Same artefact deployed to all environments</li>
+          <li>Only env vars change between dev/staging/prod</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Validation Benefits</h3>
+        <ul>
+          <li>Fail <span class="g">fast at startup</span> — not at 3 AM</li>
+          <li>TypeScript types inferred from schema</li>
+          <li>Default values for optional config</li>
+          <li>Descriptive errors for missing values</li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <h3>Terminal Output on Failure</h3>
+        <pre><code class="language-bash">$ node dist/server.js
+Invalid environment:
+{
+  JWT_SECRET: {
+    _errors: ["String must contain at
+    least 32 character(s)"]
+  },
+  DATABASE_URL: {
+    _errors: ["Required"]
+  }
+}
+# Process exits with code 1</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 9: CONTAINERISING ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">07</span>
+    <h2>Containerising a Node.js Service</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <pre><code class="language-dockerfile"># Dockerfile — Multi-stage production build
+# Stage 1: Install dependencies
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
+
+# Stage 2: Build TypeScript
+FROM deps AS build
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN pnpm build
+
+# Stage 3: Production image
+FROM node:22-alpine AS runtime
+WORKDIR /app
+
+# Security: non-root user
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -s /bin/sh -D appuser
+
+ENV NODE_ENV=production
+
+# Copy only production artifacts
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY package.json ./
+
+# Drop privileges
+USER appuser
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -qO- http://localhost:3000/health || exit 1
+
+CMD ["node", "dist/server.js"]</code></pre>
+      <pre><code class="language-bash"># .dockerignore
+node_modules
+dist
+.env*
+.git
+*.md
+coverage
+.turbo</code></pre>
+    </div>
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Multi-Stage Benefits</h3>
+        <ul>
+          <li>Final image has <span class="a">no devDependencies</span></li>
+          <li>No TypeScript compiler in production</li>
+          <li>Image size: ~150 MB (Alpine) vs ~900 MB (full)</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Security Checklist</h3>
+        <ul>
+          <li><span class="g">Non-root user</span> &mdash; never run as root</li>
+          <li><span class="g">NODE_ENV=production</span> &mdash; disables dev features</li>
+          <li>No .env files in image</li>
+          <li>Pin exact base image versions</li>
+        </ul>
+      </div>
+      <table>
+        <tr><th>Base Image</th><th>Size</th><th>Use Case</th></tr>
+        <tr><td><code>node:22-alpine</code></td><td>~55 MB</td><td>Best default choice</td></tr>
+        <tr><td><code>node:22-slim</code></td><td>~80 MB</td><td>Need glibc (native addons)</td></tr>
+        <tr><td><code>gcr.io/distroless/nodejs</code></td><td>~45 MB</td><td>Minimal attack surface</td></tr>
+        <tr><td><code>node:22</code></td><td>~350 MB</td><td>Avoid in production</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 10: DOCKER COMPOSE ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">08</span>
+    <h2>Docker Compose for Local Development</h2>
+  </div>
+  <pre><code class="language-yaml"># docker-compose.yml
+services:
+  user-service:
+    build: ./services/user-service
+    ports: ["3000:3000"]
+    environment:
+      DATABASE_URL: postgres://app:secret@postgres:5432/users
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbit:5672
+      JWT_SECRET: local-dev-secret-min-32-chars-long!!
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis:    { condition: service_healthy }
+      rabbit:   { condition: service_healthy }
+    networks: [backend]
+
+  order-service:
+    build: ./services/order-service
+    ports: ["3001:3001"]
+    environment:
+      DATABASE_URL: postgres://app:secret@postgres:5432/orders
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbit:5672
+      USER_SERVICE_URL: http://user-service:3000
+      JWT_SECRET: local-dev-secret-min-32-chars-long!!
+    depends_on: [postgres, redis, rabbit]
+    networks: [backend]
+
+  payment-service:
+    build: ./services/payment-service
+    ports: ["3002:3002"]
+    environment:
+      RABBITMQ_URL: amqp://rabbit:5672
+      STRIPE_KEY: sk_test_fake_key_for_dev
+    depends_on: [rabbit]
+    networks: [backend]
+
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: secret }
+    volumes: [pg_data:/var/lib/postgresql/data, ./init-db.sql:/docker-entrypoint-initdb.d/init.sql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+    networks: [backend]
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+    networks: [backend]
+
+  rabbit:
+    image: rabbitmq:3.13-management-alpine
+    ports: ["5672:5672", "15672:15672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+    networks: [backend]
+
+volumes:
+  pg_data:
+
+networks:
+  backend:
+    driver: bridge</code></pre>
+</section>
+
+<!-- ============== SLIDE 11: INTER-SERVICE COMMUNICATION ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">09</span>
+    <h2>Inter-Service Communication</h2>
+  </div>
+  <div class="cols cols-2">
+    <div class="card amber">
+      <h3>Synchronous (Request/Response)</h3>
+      <ul>
+        <li><span class="a">HTTP/REST</span> &mdash; simple, widely understood</li>
+        <li><span class="a">gRPC</span> &mdash; binary protocol, codegen, streaming</li>
+        <li>Client expects a response immediately</li>
+        <li>Creates temporal coupling between services</li>
+      </ul>
+      <pre><code class="language-typescript">// Calling another service via HTTP
+const user = await fetch(
+  `${config.USER_SERVICE_URL}/api/users/${id}`,
+  { headers: { Authorization: req.headers.authorization } }
+).then(r =&gt; r.json());</code></pre>
+    </div>
+    <div class="card green">
+      <h3>Asynchronous (Event-Driven)</h3>
+      <ul>
+        <li><span class="g">Message queues</span> &mdash; RabbitMQ, SQS, Redis Streams</li>
+        <li><span class="g">Event bus</span> &mdash; Kafka, NATS, EventBridge</li>
+        <li>Fire-and-forget, eventual consistency</li>
+        <li>Services are decoupled in time</li>
+      </ul>
+      <pre><code class="language-typescript">// Publishing an event
+await channel.publish('events', 'order.created',
+  Buffer.from(JSON.stringify({
+    orderId, userId, total, createdAt: new Date()
+  }))
+);</code></pre>
+    </div>
+  </div>
+  <table style="margin-top: .3em;">
+    <tr><th>Criteria</th><th>HTTP/REST</th><th>gRPC</th><th>Message Queue</th><th>Event Bus</th></tr>
+    <tr><td>Latency</td><td>Medium</td><td>Low</td><td>Variable</td><td>Variable</td></tr>
+    <tr><td>Coupling</td><td>High</td><td>High</td><td>Low</td><td>Very Low</td></tr>
+    <tr><td>Complexity</td><td>Low</td><td>Medium</td><td>Medium</td><td>High</td></tr>
+    <tr><td>Reliability</td><td>Retry needed</td><td>Retry needed</td><td>Built-in</td><td>Built-in</td></tr>
+    <tr><td>Best For</td><td>CRUD, queries</td><td>High-throughput internal</td><td>Task processing</td><td>Domain events</td></tr>
+  </table>
+</section>
+
+<!-- ============== SLIDE 12: MESSAGE QUEUES ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">10</span>
+    <h2>Message Queues &amp; Event-Driven Architecture</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Publisher (order-service)</h3>
+        <pre><code class="language-typescript">// src/mq.ts — RabbitMQ with amqplib
+import amqp from 'amqplib';
+
+let connection: amqp.Connection;
+let channel: amqp.Channel;
+
+export async function connectMQ(url: string) {
+  connection = await amqp.connect(url);
+  channel = await connection.createChannel();
+
+  // Ensure exchange exists
+  await channel.assertExchange(
+    'events', 'topic', { durable: true }
+  );
+  return { connection, channel };
+}
+
+// Publish a domain event
+export async function publishEvent(
+  routingKey: string,
+  payload: Record&lt;string, unknown&gt;
+) {
+  const msg = JSON.stringify({
+    id: crypto.randomUUID(),
+    type: routingKey,
+    timestamp: new Date().toISOString(),
+    data: payload,
+  });
+
+  channel.publish(
+    'events',
+    routingKey,
+    Buffer.from(msg),
+    { persistent: true, contentType: 'application/json' }
+  );
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Consumer (payment-service)</h3>
+        <pre><code class="language-typescript">// src/consumers/order-created.ts
+import { channel } from '../mq.js';
+
+export async function startConsumer() {
+  const q = await channel.assertQueue(
+    'payment.order-created',
+    { durable: true }
+  );
+
+  await channel.bindQueue(
+    q.queue, 'events', 'order.created'
+  );
+
+  // Prefetch 1 = process one at a time
+  channel.prefetch(1);
+
+  channel.consume(q.queue, async (msg) =&gt; {
+    if (!msg) return;
+    try {
+      const event = JSON.parse(
+        msg.content.toString()
+      );
+      await processPayment(event.data);
+      channel.ack(msg);     // success
+    } catch (err) {
+      channel.nack(msg, false, true); // requeue
+    }
+  });
+}</code></pre>
+      </div>
+      <div class="card purple">
+        <h3>Broker Comparison</h3>
+        <table>
+          <tr><th>Broker</th><th>Strength</th></tr>
+          <tr><td>RabbitMQ</td><td>Routing flexibility, mature</td></tr>
+          <tr><td>NATS</td><td>Ultra low latency, cloud-native</td></tr>
+          <tr><td>Redis Streams</td><td>If you already have Redis</td></tr>
+          <tr><td>AWS SQS</td><td>Zero ops, serverless</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 13: API GATEWAY ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">11</span>
+    <h2>API Gateway Pattern</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <svg class="diagram" width="460" height="260" viewBox="0 0 460 260">
+        <text x="20" y="20" fill="#8888a8" font-family="JetBrains Mono" font-size="10">Clients</text>
+        <rect x="10" y="30" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="50" y="52" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">Web App</text>
+        <rect x="10" y="75" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="50" y="97" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">Mobile</text>
+        <rect x="10" y="120" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="50" y="142" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">3rd Party</text>
+        <!-- Arrows to gateway -->
+        <line x1="90" y1="47" x2="150" y2="100" stroke="#2a2a3a" stroke-width="1"/>
+        <line x1="90" y1="92" x2="150" y2="105" stroke="#2a2a3a" stroke-width="1"/>
+        <line x1="90" y1="137" x2="150" y2="110" stroke="#2a2a3a" stroke-width="1"/>
+        <!-- API Gateway -->
+        <rect x="150" y="30" width="130" height="190" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
+        <text x="215" y="52" text-anchor="middle" fill="#f5a623" font-family="Playfair Display" font-size="12" font-weight="700">API Gateway</text>
+        <rect x="162" y="60" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
+        <text x="215" y="75" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Auth / JWT</text>
+        <rect x="162" y="88" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
+        <text x="215" y="103" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Rate Limiting</text>
+        <rect x="162" y="116" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
+        <text x="215" y="131" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Routing</text>
+        <rect x="162" y="144" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
+        <text x="215" y="159" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Request Transform</text>
+        <rect x="162" y="172" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
+        <text x="215" y="187" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Logging</text>
+        <!-- Services -->
+        <rect x="340" y="30" width="110" height="40" rx="6" fill="#10101a" stroke="#4ecb8d" stroke-width="1.5"/>
+        <text x="395" y="55" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="10">user-svc</text>
+        <rect x="340" y="80" width="110" height="40" rx="6" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="395" y="105" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">order-svc</text>
+        <rect x="340" y="130" width="110" height="40" rx="6" fill="#10101a" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="395" y="155" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10">payment-svc</text>
+        <!-- Arrows to services -->
+        <line x1="280" y1="80" x2="340" y2="50" stroke="#f5a623" stroke-width="1.5"/>
+        <line x1="280" y1="105" x2="340" y2="100" stroke="#f5a623" stroke-width="1.5"/>
+        <line x1="280" y1="130" x2="340" y2="150" stroke="#f5a623" stroke-width="1.5"/>
+      </svg>
+      <div class="card blue" style="margin-top: .2em;">
+        <h3>Gateway Options</h3>
+        <table>
+          <tr><th>Tool</th><th>Type</th><th>Notes</th></tr>
+          <tr><td>Kong</td><td>Full-featured</td><td>Plugins, Lua-based</td></tr>
+          <tr><td>Nginx</td><td>Reverse proxy</td><td>High perf, config-driven</td></tr>
+          <tr><td>AWS API GW</td><td>Managed</td><td>Zero ops, pay-per-call</td></tr>
+          <tr><td>Express</td><td>Custom</td><td>Full control, more work</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card amber">
+        <h3>Simple Express Gateway</h3>
+        <pre><code class="language-typescript">// gateway/src/server.ts
+import express from 'express';
+import { createProxyMiddleware } from
+  'http-proxy-middleware';
+import rateLimit from 'express-rate-limit';
+import { verifyJWT } from './auth.js';
+
+const app = express();
+
+// Global rate limiting
+app.use(rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+}));
+
+// Auth middleware (skip for public routes)
+app.use('/api', verifyJWT);
+
+// Route to services
+app.use('/api/users',
+  createProxyMiddleware({
+    target: 'http://user-service:3000',
+    pathRewrite: { '^/api/users': '/api/users' },
+    changeOrigin: true,
+  })
+);
+
+app.use('/api/orders',
+  createProxyMiddleware({
+    target: 'http://order-service:3001',
+    pathRewrite: { '^/api/orders': '/api/orders' },
+    changeOrigin: true,
+  })
+);
+
+app.use('/api/payments',
+  createProxyMiddleware({
+    target: 'http://payment-service:3002',
+    pathRewrite: {
+      '^/api/payments': '/api/payments'
+    },
+    changeOrigin: true,
+  })
+);
+
+app.listen(8080, () =&gt;
+  console.log('Gateway on :8080')
+);</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 14: SERVICE DISCOVERY ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">12</span>
+    <h2>Service Discovery &amp; Load Balancing</h2>
+  </div>
+  <div class="cols cols-3">
+    <div class="card amber">
+      <h3>DNS-Based (Simplest)</h3>
+      <ul>
+        <li>Docker Compose: service name = hostname</li>
+        <li>Kubernetes: <code>service-name.namespace.svc.cluster.local</code></li>
+        <li>No code changes needed</li>
+        <li>DNS caching can cause stale lookups</li>
+      </ul>
+      <pre><code class="language-typescript">// In Docker Compose, service names
+// resolve to container IPs:
+const url = 'http://user-service:3000';
+// K8s:
+const url =
+  'http://user-svc.default.svc.cluster.local';</code></pre>
+    </div>
+    <div class="card green">
+      <h3>Client-Side Discovery</h3>
+      <ul>
+        <li>Service registers itself in a registry</li>
+        <li>Client queries registry, picks an instance</li>
+        <li>Tools: Consul, etcd, Eureka</li>
+        <li>More control, more complexity</li>
+      </ul>
+      <pre><code class="language-typescript">// Using Consul for discovery
+import Consul from 'consul';
+const consul = new Consul();
+
+const services = await consul.health
+  .service({ service: 'user-service', passing: true });
+
+const instance = services[
+  Math.floor(Math.random() * services.length)
+];
+const url =
+  `http://${instance.Service.Address}:${instance.Service.Port}`;</code></pre>
+    </div>
+    <div class="card purple">
+      <h3>Service Mesh</h3>
+      <ul>
+        <li>Sidecar proxy intercepts all traffic</li>
+        <li>Zero application code changes</li>
+        <li>mTLS, retries, circuit breaking built in</li>
+        <li>Tools: Istio, Linkerd, Consul Connect</li>
+      </ul>
+      <pre><code class="language-yaml"># Istio VirtualService
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: user-service
+spec:
+  hosts: [user-service]
+  http:
+  - route:
+    - destination:
+        host: user-service
+      weight: 90
+    - destination:
+        host: user-service-canary
+      weight: 10</code></pre>
+    </div>
+  </div>
+  <div class="ss-row" style="justify-content: center; margin-top: .3em;">
+    <span class="ss-node done">DNS (Compose/K8s)</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node active">Client Discovery (Consul)</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node">Service Mesh (Istio)</span>
+    <span class="ss-label">complexity &amp; power &#8594;</span>
+  </div>
+</section>
+
+<!-- ============== SLIDE 15: AUTHENTICATION BETWEEN SERVICES ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">13</span>
+    <h2>Authentication Between Services</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>JWT Middleware</h3>
+        <pre><code class="language-typescript">// src/middleware/auth.ts
+import jwt from 'jsonwebtoken';
+import { config } from '../config.js';
+import { FastifyRequest, FastifyReply } from 'fastify';
+
+interface JWTPayload {
+  sub: string;
+  email: string;
+  roles: string[];
+  iat: number;
+  exp: number;
+}
+
+export async function verifyJWT(
+  req: FastifyRequest,
+  reply: FastifyReply
+) {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) {
+    return reply.status(401).send({
+      error: 'Missing bearer token'
+    });
+  }
+
+  try {
+    const token = header.slice(7);
+    const payload = jwt.verify(
+      token, config.JWT_SECRET
+    ) as JWTPayload;
+
+    // Attach to request for downstream use
+    req.user = payload;
+  } catch (err) {
+    return reply.status(401).send({
+      error: 'Invalid or expired token'
+    });
+  }
+}
+
+// Propagate JWT to downstream services
+export function forwardAuth(req: FastifyRequest) {
+  return {
+    Authorization: req.headers.authorization,
+    'X-Request-Id': req.headers['x-request-id'],
+  };
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>JWT Propagation (Most Common)</h3>
+        <ul>
+          <li>Gateway validates user JWT once</li>
+          <li>JWT forwarded to internal services via <code>Authorization</code> header</li>
+          <li>Each service can inspect claims (roles, sub)</li>
+          <li>No extra network calls for auth</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-bottom: .3em;">
+        <h3>Service-to-Service Auth</h3>
+        <ul>
+          <li><span class="p">API Keys</span> &mdash; simple, rotated via env vars</li>
+          <li><span class="p">mTLS</span> &mdash; mutual TLS, handled by service mesh</li>
+          <li><span class="p">Service JWTs</span> &mdash; short-lived, machine-to-machine</li>
+        </ul>
+        <pre><code class="language-typescript">// Service-to-service with API key
+const res = await fetch(url, {
+  headers: {
+    'X-Service-Key': config.INTERNAL_API_KEY,
+    'X-Service-Name': 'order-service',
+  }
+});</code></pre>
+      </div>
+      <div class="card red">
+        <h3>Security Pitfalls</h3>
+        <ul>
+          <li>Never expose internal services to the internet</li>
+          <li>Rotate keys/secrets via K8s Secrets or Vault</li>
+          <li>Set short JWT expiry (15m) + refresh tokens</li>
+          <li>Log auth failures &mdash; detect brute force</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 16: LOGGING & OBSERVABILITY ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">14</span>
+    <h2>Logging &amp; Observability</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Structured Logging with Pino</h3>
+        <pre><code class="language-typescript">// src/logger.ts
+import pino from 'pino';
+import { config } from './config.js';
+
+export const logger = pino({
+  level: config.LOG_LEVEL,
+  base: {
+    service: 'order-service',
+    version: process.env.npm_package_version,
+    env: config.NODE_ENV,
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level: (label) =&gt; ({ level: label }),
+  },
+  redact: ['req.headers.authorization',
+           'req.headers.cookie'],
+});</code></pre>
+      </div>
+      <div class="card green">
+        <h3>Correlation IDs Across Services</h3>
+        <pre><code class="language-typescript">// src/middleware/correlation.ts
+import { FastifyInstance } from 'fastify';
+import crypto from 'node:crypto';
+
+export function correlationPlugin(app: FastifyInstance) {
+  app.addHook('onRequest', (req, _reply, done) =&gt; {
+    // Use incoming ID or generate new one
+    const correlationId =
+      (req.headers['x-request-id'] as string)
+      ?? crypto.randomUUID();
+
+    req.correlationId = correlationId;
+
+    // Bind to logger for this request
+    req.log = req.log.child({ correlationId });
+    done();
+  });
+
+  app.addHook('onSend', (req, reply, _payload, done) =&gt; {
+    reply.header('X-Request-Id', req.correlationId);
+    done();
+  });
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple" style="margin-bottom: .3em;">
+        <h3>JSON Log Output</h3>
+        <pre><code class="language-json">{
+  "level": "info",
+  "time": "2026-03-24T10:23:45.123Z",
+  "service": "order-service",
+  "correlationId": "a1b2c3d4-e5f6-...",
+  "msg": "Order created",
+  "orderId": "ord_98765",
+  "userId": "usr_12345",
+  "total": 49.99,
+  "responseTime": 23
+}</code></pre>
+      </div>
+      <div class="card blue" style="margin-bottom: .3em;">
+        <h3>Observability Stack</h3>
+        <table>
+          <tr><th>Pillar</th><th>Tool</th></tr>
+          <tr><td>Logs</td><td>ELK Stack / Loki + Grafana</td></tr>
+          <tr><td>Metrics</td><td>Prometheus + Grafana</td></tr>
+          <tr><td>Traces</td><td>Jaeger / Tempo (OpenTelemetry)</td></tr>
+          <tr><td>Alerting</td><td>Grafana Alerting / PagerDuty</td></tr>
+        </table>
+      </div>
+      <div class="card red">
+        <h3>Key Rule</h3>
+        <p>Every log line must include a <span class="r">correlationId</span>. Without it, debugging across 5+ services is impossible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 17: KUBERNETES DEPLOYMENT ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">15</span>
+    <h2>Deploying to Kubernetes</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <pre><code class="language-yaml"># k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: user-service }
+  template:
+    metadata:
+      labels: { app: user-service }
+    spec:
+      containers:
+      - name: user-service
+        image: ghcr.io/myorg/user-service:1.4.2
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: user-db-secret
+              key: url
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet: { path: /health, port: 3000 }
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet: { path: /ready, port: 3000 }
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      terminationGracePeriodSeconds: 30</code></pre>
+    </div>
+    <div>
+      <pre><code class="language-yaml"># k8s/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector: { app: user-service }
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: ClusterIP
+---
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /users(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: user-service
+            port: { number: 80 }</code></pre>
+      <pre><code class="language-yaml"># k8s/hpa.yaml — Autoscaling
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-service
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 18: AWS DEPLOYMENT ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">16</span>
+    <h2>Deploying to AWS (ECS/Fargate &amp; Lambda)</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>ECS Task Definition</h3>
+        <pre><code class="language-json">{
+  "family": "user-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [{
+    "name": "user-service",
+    "image": "123456789.dkr.ecr.us-east-1.amazonaws.com/user-service:1.4.2",
+    "portMappings": [{ "containerPort": 3000 }],
+    "environment": [
+      { "name": "NODE_ENV", "value": "production" }
+    ],
+    "secrets": [{
+      "name": "DATABASE_URL",
+      "valueFrom": "arn:aws:ssm:us-east-1:123456789:parameter/prod/user-service/db-url"
+    }],
+    "healthCheck": {
+      "command": ["CMD-SHELL",
+        "wget -qO- http://localhost:3000/health || exit 1"],
+      "interval": 30,
+      "timeout": 5,
+      "retries": 3
+    },
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/user-service",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "ecs"
+      }
+    }
+  }]
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <table style="margin-bottom: .3em;">
+        <tr><th>Criteria</th><th>ECS/Fargate</th><th>Lambda</th></tr>
+        <tr><td>Startup</td><td>~30s (container)</td><td>~200ms (cold start)</td></tr>
+        <tr><td>Long-running</td><td>Yes, always on</td><td>Max 15 min</td></tr>
+        <tr><td>Scaling</td><td>Min/max tasks</td><td>Automatic, per-request</td></tr>
+        <tr><td>WebSockets</td><td>Supported</td><td>Via API GW WS</td></tr>
+        <tr><td>Cost model</td><td>Per hour (vCPU+mem)</td><td>Per invocation</td></tr>
+        <tr><td>Best for</td><td>Stateful / high traffic</td><td>Bursty / event-driven</td></tr>
+      </table>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Fargate vs EC2 Launch Type</h3>
+        <ul>
+          <li><span class="g">Fargate:</span> zero server management, pay-per-task, best default</li>
+          <li><span class="g">EC2:</span> cheaper at scale, GPU workloads, more control</li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <h3>Lambda as Microservice</h3>
+        <pre><code class="language-typescript">// handler.ts — Lambda with API GW
+import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+
+export const handler: APIGatewayProxyHandlerV2 =
+  async (event) =&gt; {
+    const { pathParameters, body } = event;
+    // Same business logic, different wrapper
+    const user = await userService.getById(
+      pathParameters?.id!
+    );
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user),
+    };
+  };</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 19: CI/CD PIPELINE ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">17</span>
+    <h2>CI/CD Pipeline for Microservices</h2>
+  </div>
+  <pre><code class="language-yaml"># .github/workflows/deploy-service.yml
+name: Build & Deploy Service
+on:
+  push:
+    branches: [main]
+    paths: ['services/user-service/**']   # Only trigger for this service
+
+env:
+  SERVICE: user-service
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with: { node-version: 22, cache: 'pnpm' }
+
+    - name: Install & Test
+      run: |
+        corepack enable
+        pnpm install --frozen-lockfile
+        pnpm --filter ${{ env.SERVICE }} run lint
+        pnpm --filter ${{ env.SERVICE }} run test
+        pnpm --filter ${{ env.SERVICE }} run build
+
+    - name: Set image tag
+      id: tag
+      run: echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Build & Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: services/${{ env.SERVICE }}
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.SERVICE }}:${{ steps.tag.outputs.tag }}
+          ${{ env.REGISTRY }}/${{ env.SERVICE }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Deploy to Kubernetes
+      uses: azure/k8s-deploy@v5
+      with:
+        manifests: services/${{ env.SERVICE }}/k8s/
+        images: ${{ env.REGISTRY }}/${{ env.SERVICE }}:${{ steps.tag.outputs.tag }}
+        namespace: production
+        strategy: canary
+        percentage: 20</code></pre>
+  <div class="ss-row" style="justify-content: center; margin-top: .3em;">
+    <span class="ss-node done">Push to main</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node done">Lint + Test</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node done">Build Image</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node active">Canary 20%</span>
+    <span class="ss-arrow">&#8594;</span>
+    <span class="ss-node">Full Rollout</span>
+  </div>
+</section>
+
+<!-- ============== SLIDE 20: DATABASE PER SERVICE ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">18</span>
+    <h2>Database per Service</h2>
+  </div>
+  <div class="cols cols-6040">
+    <div>
+      <svg class="diagram" width="440" height="250" viewBox="0 0 440 250">
+        <!-- User service -->
+        <rect x="10" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#4ecb8d" stroke-width="1.5"/>
+        <text x="75" y="40" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">user-service</text>
+        <line x1="75" y1="60" x2="75" y2="85" stroke="#4ecb8d" stroke-width="1.5"/>
+        <rect x="20" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#4ecb8d" stroke-width="1"/>
+        <text x="75" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+        <text x="75" y="117" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="8">users, profiles</text>
+        <!-- Order service -->
+        <rect x="160" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="225" y="40" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11">order-service</text>
+        <line x1="225" y1="60" x2="225" y2="85" stroke="#60a5fa" stroke-width="1.5"/>
+        <rect x="170" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#60a5fa" stroke-width="1"/>
+        <text x="225" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">MongoDB</text>
+        <text x="225" y="117" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">orders, items</text>
+        <!-- Payment service -->
+        <rect x="310" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="375" y="40" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="11">payment-svc</text>
+        <line x1="375" y1="60" x2="375" y2="85" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="320" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#a78bfa" stroke-width="1"/>
+        <text x="375" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+        <text x="375" y="117" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">transactions</text>
+        <!-- Red X for direct DB access -->
+        <text x="150" y="105" fill="#f87171" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
+        <text x="300" y="105" fill="#f87171" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
+        <!-- Event bus -->
+        <rect x="80" y="155" width="290" height="35" rx="6" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
+        <text x="225" y="177" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">Event Bus (domain events for data sync)</text>
+        <line x1="75" y1="125" x2="140" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="225" y1="125" x2="225" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="375" y1="125" x2="310" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
+        <!-- Rule text -->
+        <text x="225" y="215" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="10">Rule: services NEVER access another service's database</text>
+        <text x="225" y="235" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">Communicate via APIs or events only</text>
+      </svg>
+    </div>
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Why Own Your Data</h3>
+        <ul>
+          <li>Independent schema evolution</li>
+          <li>Choose the right DB per workload</li>
+          <li>No shared-DB coupling between teams</li>
+          <li>Services can be deployed independently</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>The Saga Pattern</h3>
+        <p>Distributed transactions across services using a sequence of local transactions + compensating actions:</p>
+        <ol>
+          <li><span class="g">order-service</span>: create order (PENDING)</li>
+          <li><span class="g">payment-service</span>: charge card</li>
+          <li><span class="g">inventory-service</span>: reserve stock</li>
+          <li>If any step fails &#8594; run <span class="r">compensations</span></li>
+        </ol>
+      </div>
+      <div class="card purple">
+        <h3>Data Consistency Strategies</h3>
+        <table>
+          <tr><th>Pattern</th><th>Consistency</th></tr>
+          <tr><td>Saga (choreography)</td><td>Eventual</td></tr>
+          <tr><td>Saga (orchestration)</td><td>Eventual</td></tr>
+          <tr><td>Event Sourcing</td><td>Eventual</td></tr>
+          <tr><td>Outbox Pattern</td><td>At-least-once</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 21: COMMON PITFALLS ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">19</span>
+    <h2>Common Pitfalls &amp; Production Lessons</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card red" style="margin-bottom: .3em;">
+        <h3>Distributed System Fallacies</h3>
+        <ul>
+          <li>The network is <span class="r">not</span> reliable</li>
+          <li>Latency is <span class="r">not</span> zero</li>
+          <li>Bandwidth is <span class="r">not</span> infinite</li>
+          <li>The topology <span class="r">does</span> change</li>
+        </ul>
+        <p style="margin-top: .15em;">Every inter-service call can fail. Design for it.</p>
+      </div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Circuit Breaker (opossum)</h3>
+        <pre><code class="language-typescript">import CircuitBreaker from 'opossum';
+
+const breaker = new CircuitBreaker(
+  async (userId: string) =&gt; {
+    const res = await fetch(
+      `${config.USER_SERVICE_URL}/api/users/${userId}`
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+  {
+    timeout: 3000,           // 3s per call
+    errorThresholdPercentage: 50,
+    resetTimeout: 10000,     // try again after 10s
+    volumeThreshold: 5,      // min calls before tripping
+  }
+);
+
+breaker.on('open',    () =&gt; log.warn('Circuit OPEN'));
+breaker.on('halfOpen',() =&gt; log.info('Circuit HALF-OPEN'));
+breaker.on('close',   () =&gt; log.info('Circuit CLOSED'));
+
+// Usage
+breaker.fallback(() =&gt; ({ id: userId, name: 'Unknown' }));
+const user = await breaker.fire(userId);</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green" style="margin-bottom: .3em;">
+        <h3>Retry with Exponential Backoff</h3>
+        <pre><code class="language-typescript">// src/utils/retry.ts
+export async function retry&lt;T&gt;(
+  fn: () =&gt; Promise&lt;T&gt;,
+  opts = { maxRetries: 3, baseDelay: 200 }
+): Promise&lt;T&gt; {
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt &lt;= opts.maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err as Error;
+      if (attempt &lt; opts.maxRetries) {
+        const delay = opts.baseDelay * 2 ** attempt
+          + Math.random() * 100; // jitter
+        await new Promise(r =&gt; setTimeout(r, delay));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+// Usage
+const data = await retry(
+  () =&gt; fetchFromService(url),
+  { maxRetries: 3, baseDelay: 200 }
+);</code></pre>
+      </div>
+      <div class="card purple">
+        <h3>Timeout Management</h3>
+        <ul>
+          <li>Set timeouts on <span class="p">every</span> outbound call</li>
+          <li>Use <code>AbortController</code> with <code>fetch</code></li>
+          <li>Cascade: gateway 30s &gt; service 10s &gt; DB 5s</li>
+          <li>Without timeouts: one slow service kills all</li>
+        </ul>
+        <pre><code class="language-typescript">const controller = new AbortController();
+setTimeout(() =&gt; controller.abort(), 5000);
+
+const res = await fetch(url, {
+  signal: controller.signal,
+});</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SLIDE 22: SUMMARY ============== -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">20</span>
+    <h2>Summary &amp; Further Reading</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber" style="margin-bottom: .3em;">
+        <h3>Key Takeaways</h3>
+        <ol>
+          <li><span class="a">Start monolithic</span> &mdash; extract services when team/scaling pain is real</li>
+          <li>Each service: health checks, graceful shutdown, structured logging</li>
+          <li>Validate config at startup &mdash; fail fast, not at 3 AM</li>
+          <li>Multi-stage Dockerfiles, non-root user, Alpine base</li>
+          <li>Prefer <span class="a">async messaging</span> over sync HTTP between services</li>
+          <li>Database per service + saga pattern for consistency</li>
+          <li>Circuit breakers, retries, timeouts on every call</li>
+          <li>Correlation IDs in every log line across every service</li>
+        </ol>
+      </div>
+      <div class="card green">
+        <h3>Learning Path</h3>
+        <div class="ss-row" style="flex-wrap: wrap;">
+          <span class="ss-node done">Node.js basics</span>
+          <span class="ss-arrow">&#8594;</span>
+          <span class="ss-node done">REST APIs</span>
+          <span class="ss-arrow">&#8594;</span>
+          <span class="ss-node active">Docker</span>
+          <span class="ss-arrow">&#8594;</span>
+          <span class="ss-node">K8s</span>
+          <span class="ss-arrow">&#8594;</span>
+          <span class="ss-node">Service Mesh</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card purple" style="margin-bottom: .3em;">
+        <h3>Recommended Books</h3>
+        <ul>
+          <li><span class="p">Building Microservices</span> &mdash; Sam Newman (2nd ed.) &mdash; the definitive guide to microservice architecture</li>
+          <li><span class="p">Node.js Design Patterns</span> &mdash; Mario Casciaro &amp; Luciano Mammino &mdash; advanced patterns for production Node</li>
+          <li><span class="p">Designing Data-Intensive Applications</span> &mdash; Martin Kleppmann &mdash; distributed data fundamentals</li>
+          <li><span class="p">Release It!</span> &mdash; Michael Nygard &mdash; production stability patterns</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>Tools &amp; Resources</h3>
+        <table>
+          <tr><th>Category</th><th>Tools</th></tr>
+          <tr><td>Framework</td><td>Fastify, NestJS, Express</td></tr>
+          <tr><td>Queue</td><td>RabbitMQ, BullMQ, NATS</td></tr>
+          <tr><td>Containers</td><td>Docker, Podman, Buildah</td></tr>
+          <tr><td>Orchestration</td><td>Kubernetes, ECS, Nomad</td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions, GitLab CI</td></tr>
+          <tr><td>Monitoring</td><td>Prometheus, Grafana, Datadog</td></tr>
+          <tr><td>Tracing</td><td>OpenTelemetry, Jaeger</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  controls: true,
+  progress: true,
+  center: false,
+  width: 1100,
+  height: 900,
+  margin: 0.01,
+  plugins: [RevealHighlight],
+  highlight: { theme: 'monokai' }
+});
+</script>
+<script>
+(function(){
+  var h = Reveal.getConfig().height || 900;
+  var m = Reveal.getConfig().margin || 0.02;
+  var maxH = Math.floor(h * (1 - 2 * m)) + 'px';
+  function fixSlides(){
+    document.querySelectorAll('.reveal .slides>section,.reveal .slides>section>section').forEach(function(s){
+      s.style.display = 'block';
+      s.style.maxHeight = maxH;
+    });
+  }
+  Reveal.on('ready', fixSlides);
+  Reveal.on('slidechanged', fixSlides);
+})();
+</script>
+</body>
+</html>
