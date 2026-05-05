@@ -45,6 +45,13 @@ An interactive Reveal.js presentation on deploying Node.js microservices — ser
 | Fullscreen | `F` |
 | Export to PDF | Append `?print-pdf` to URL, then print |
 
+## See also
+
+- [Cloud_aaS_02_IaaS_Foundations](https://github.com/BrendanJamesLynskey/Cloud_aaS_02_IaaS_Foundations) — VPC, storage, region/AZ design that microservices sit on.
+- [Cloud_aaS_03_PaaS_FaaS_CaaS](https://github.com/BrendanJamesLynskey/Cloud_aaS_03_PaaS_FaaS_CaaS) — managed compute layers (Cloud Run / Fargate / Container Apps / managed K8s) and decision matrix.
+- Series hub: [Cloud `*aaS`](https://github.com/BrendanJamesLynskey/Cloud_aaS_Hub).
+- Companion: [Introduction to Node.js](https://github.com/BrendanJamesLynskey/Introduction_to_Node_js), [Introduction to CI/CD](https://github.com/BrendanJamesLynskey/Introduction_to_CI_CD).
+
 ## Technology
 
 [Reveal.js 4.6](https://revealjs.com) · [highlight.js](https://highlightjs.org) · Playfair Display + DM Sans + JetBrains Mono
