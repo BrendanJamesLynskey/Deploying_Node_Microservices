@@ -11,17 +11,17 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
 <style>
   :root {
-    --amber:  #f5a623;
-    --green:  #4ecb8d;
-    --purple: #a78bfa;
-    --blue:   #60a5fa;
-    --red:    #f87171;
-    --bg:     #0a0a0f;
-    --bg2:    #10101a;
-    --bg3:    #181824;
-    --border: #2a2a3a;
-    --text:   #e8e8f0;
-    --muted:  #8888a8;
+    --amber:  #efba4d;
+    --green:  #9dcba3;
+    --purple: #c2aef4;
+    --blue:   #93c6eb;
+    --red:    #f0846a;
+    --bg:     #17193a;
+    --bg2:    #1c1f44;
+    --bg3:    #21254d;
+    --border: #363c6c;
+    --text:   #efece6;
+    --muted:  #9093ba;
   }
 
   .reveal-viewport { background: var(--bg); }
@@ -37,7 +37,7 @@
   .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
   .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
                  border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
-  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #dedde3; }
 
   .slide-hdr {
     display: flex; align-items: center; gap: .4em;
@@ -69,15 +69,15 @@
   .card.blue  { border-left: 3px solid var(--blue); }
   .card.red   { border-left: 3px solid var(--red); }
   .card h3 { font-size: .64em; margin: 0 0 .12em; }
-  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card p  { font-size: .52em; margin: 0; color: #c3c4dc; }
   .card ul { margin: 0; padding-left: 1em; }
-  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+  .card li { font-size: .52em; color: #c3c4dc; margin-bottom: .02em; }
 
   .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
   .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
                      padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
-  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
-  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #d4d4e1; }
+  .reveal table tr:nth-child(even) td { background: #1b1d41; }
 
   .a  { color: var(--amber); font-weight: 600; }
   .g  { color: var(--green); font-weight: 600; }
@@ -114,8 +114,8 @@
     padding: .2em .55em; border-radius: 5px; font-size: .9em;
     background: var(--bg3); border: 1px solid var(--border); color: var(--text);
   }
-  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
-  .ss-node.done   { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-node.active { background: #333c41; border-color: var(--green); color: var(--green); }
+  .ss-node.done   { background: #232851; border-color: var(--purple); color: var(--purple); }
   .ss-arrow { color: var(--amber); }
   .ss-label { font-size: .8em; color: var(--muted); margin-left: .3em; }
 
@@ -128,7 +128,7 @@
 <div class="slides">
 
 <!-- ============== SLIDE 1: TITLE ============== -->
-<section data-background-color="#0a0a0f" class="title-slide">
+<section data-background-color="#17193a" class="title-slide">
   <h1>Deploying Node.js Microservices</h1>
   <div class="subtitle">From localhost to production-grade distributed systems</div>
   <div style="margin: .3em 0;">
@@ -151,7 +151,7 @@
 </section>
 
 <!-- ============== SLIDE 2: AGENDA ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">00</span>
     <h2>Topics We'll Cover</h2>
@@ -200,7 +200,7 @@
 </section>
 
 <!-- ============== SLIDE 3: MONOLITH VS MICROSERVICES ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">01</span>
     <h2>Monolith vs Microservices</h2>
@@ -229,47 +229,47 @@
   </div>
   <svg class="diagram" width="950" height="260" viewBox="0 0 950 260">
     <!-- Monolith -->
-    <rect x="20" y="20" width="200" height="180" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
-    <text x="120" y="50" text-anchor="middle" fill="#f5a623" font-family="Playfair Display" font-size="14" font-weight="700">Monolith</text>
-    <rect x="40" y="65" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
-    <text x="120" y="82" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Users Module</text>
-    <rect x="40" y="98" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
-    <text x="120" y="115" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Orders Module</text>
-    <rect x="40" y="131" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
-    <text x="120" y="148" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Payments Module</text>
-    <rect x="40" y="164" width="160" height="25" rx="4" fill="#181824" stroke="#2a2a3a"/>
-    <text x="120" y="181" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono" font-size="11">Shared Database</text>
+    <rect x="20" y="20" width="200" height="180" rx="8" fill="#1c1f44" stroke="#efba4d" stroke-width="2"/>
+    <text x="120" y="50" text-anchor="middle" fill="#efba4d" font-family="Playfair Display" font-size="14" font-weight="700">Monolith</text>
+    <rect x="40" y="65" width="160" height="25" rx="4" fill="#21254d" stroke="#363c6c"/>
+    <text x="120" y="82" text-anchor="middle" fill="#d4d4e1" font-family="JetBrains Mono" font-size="11">Users Module</text>
+    <rect x="40" y="98" width="160" height="25" rx="4" fill="#21254d" stroke="#363c6c"/>
+    <text x="120" y="115" text-anchor="middle" fill="#d4d4e1" font-family="JetBrains Mono" font-size="11">Orders Module</text>
+    <rect x="40" y="131" width="160" height="25" rx="4" fill="#21254d" stroke="#363c6c"/>
+    <text x="120" y="148" text-anchor="middle" fill="#d4d4e1" font-family="JetBrains Mono" font-size="11">Payments Module</text>
+    <rect x="40" y="164" width="160" height="25" rx="4" fill="#21254d" stroke="#363c6c"/>
+    <text x="120" y="181" text-anchor="middle" fill="#d4d4e1" font-family="JetBrains Mono" font-size="11">Shared Database</text>
     <!-- Arrow -->
-    <text x="310" y="115" fill="#f5a623" font-size="32">&#8594;</text>
+    <text x="310" y="115" fill="#efba4d" font-size="32">&#8594;</text>
     <!-- Microservices -->
-    <rect x="400" y="10" width="155" height="70" rx="8" fill="#10101a" stroke="#4ecb8d" stroke-width="2"/>
-    <text x="477" y="35" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">user-service</text>
-    <rect x="415" y="48" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
-    <text x="477" y="62" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
-    <rect x="400" y="90" width="155" height="70" rx="8" fill="#10101a" stroke="#60a5fa" stroke-width="2"/>
-    <text x="477" y="115" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11">order-service</text>
-    <rect x="415" y="128" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
-    <text x="477" y="142" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">MongoDB</text>
-    <rect x="400" y="170" width="155" height="70" rx="8" fill="#10101a" stroke="#a78bfa" stroke-width="2"/>
-    <text x="477" y="195" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="11">payment-service</text>
-    <rect x="415" y="208" width="125" height="20" rx="3" fill="#181824" stroke="#2a2a3a"/>
-    <text x="477" y="222" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+    <rect x="400" y="10" width="155" height="70" rx="8" fill="#1c1f44" stroke="#9dcba3" stroke-width="2"/>
+    <text x="477" y="35" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="11">user-service</text>
+    <rect x="415" y="48" width="125" height="20" rx="3" fill="#21254d" stroke="#363c6c"/>
+    <text x="477" y="62" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+    <rect x="400" y="90" width="155" height="70" rx="8" fill="#1c1f44" stroke="#93c6eb" stroke-width="2"/>
+    <text x="477" y="115" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="11">order-service</text>
+    <rect x="415" y="128" width="125" height="20" rx="3" fill="#21254d" stroke="#363c6c"/>
+    <text x="477" y="142" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">MongoDB</text>
+    <rect x="400" y="170" width="155" height="70" rx="8" fill="#1c1f44" stroke="#c2aef4" stroke-width="2"/>
+    <text x="477" y="195" text-anchor="middle" fill="#c2aef4" font-family="JetBrains Mono" font-size="11">payment-service</text>
+    <rect x="415" y="208" width="125" height="20" rx="3" fill="#21254d" stroke="#363c6c"/>
+    <text x="477" y="222" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
     <!-- Message Bus -->
-    <rect x="620" y="80" width="155" height="55" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
-    <text x="697" y="103" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">Message Bus</text>
-    <text x="697" y="122" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">RabbitMQ / NATS</text>
+    <rect x="620" y="80" width="155" height="55" rx="8" fill="#1c1f44" stroke="#efba4d" stroke-width="2"/>
+    <text x="697" y="103" text-anchor="middle" fill="#efba4d" font-family="JetBrains Mono" font-size="11">Message Bus</text>
+    <text x="697" y="122" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">RabbitMQ / NATS</text>
     <!-- Connecting lines -->
-    <line x1="555" y1="45" x2="620" y2="100" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
-    <line x1="555" y1="125" x2="620" y2="107" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
-    <line x1="555" y1="205" x2="620" y2="115" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="4"/>
+    <line x1="555" y1="45" x2="620" y2="100" stroke="#363c6c" stroke-width="1" stroke-dasharray="4"/>
+    <line x1="555" y1="125" x2="620" y2="107" stroke="#363c6c" stroke-width="1" stroke-dasharray="4"/>
+    <line x1="555" y1="205" x2="620" y2="115" stroke="#363c6c" stroke-width="1" stroke-dasharray="4"/>
     <!-- API Gateway -->
-    <rect x="620" y="160" width="155" height="45" rx="8" fill="#10101a" stroke="#4ecb8d" stroke-width="1"/>
-    <text x="697" y="187" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">API Gateway</text>
+    <rect x="620" y="160" width="155" height="45" rx="8" fill="#1c1f44" stroke="#9dcba3" stroke-width="1"/>
+    <text x="697" y="187" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="11">API Gateway</text>
   </svg>
 </section>
 
 <!-- ============== SLIDE 4: ANATOMY OF A NODE.JS MICROSERVICE ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">02</span>
     <h2>Anatomy of a Node.js Microservice</h2>
@@ -332,7 +332,7 @@ gracefulShutdown(app);</code></pre>
 </section>
 
 <!-- ============== SLIDE 5: PROJECT STRUCTURE ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">03</span>
     <h2>Structuring a Node.js Project for Microservices</h2>
@@ -396,7 +396,7 @@ gracefulShutdown(app);</code></pre>
 </section>
 
 <!-- ============== SLIDE 6: HEALTH CHECKS ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">04</span>
     <h2>Health Checks &amp; Readiness Probes</h2>
@@ -475,7 +475,7 @@ export async function healthRoutes(app: FastifyInstance) {
 </section>
 
 <!-- ============== SLIDE 7: GRACEFUL SHUTDOWN ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">05</span>
     <h2>Graceful Shutdown</h2>
@@ -568,7 +568,7 @@ export function gracefulShutdown(app: FastifyInstance) {
 </section>
 
 <!-- ============== SLIDE 8: ENVIRONMENT CONFIGURATION ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">06</span>
     <h2>Environment Configuration</h2>
@@ -654,7 +654,7 @@ Invalid environment:
 </section>
 
 <!-- ============== SLIDE 9: CONTAINERISING ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">07</span>
     <h2>Containerising a Node.js Service</h2>
@@ -736,7 +736,7 @@ coverage
 </section>
 
 <!-- ============== SLIDE 10: DOCKER COMPOSE ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">08</span>
     <h2>Docker Compose for Local Development</h2>
@@ -811,7 +811,7 @@ networks:
 </section>
 
 <!-- ============== SLIDE 11: INTER-SERVICE COMMUNICATION ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">09</span>
     <h2>Inter-Service Communication</h2>
@@ -858,7 +858,7 @@ await channel.publish('events', 'order.created',
 </section>
 
 <!-- ============== SLIDE 12: MESSAGE QUEUES ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">10</span>
     <h2>Message Queues &amp; Event-Driven Architecture</h2>
@@ -953,7 +953,7 @@ export async function startConsumer() {
 </section>
 
 <!-- ============== SLIDE 13: API GATEWAY ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">11</span>
     <h2>API Gateway Pattern</h2>
@@ -961,41 +961,41 @@ export async function startConsumer() {
   <div class="cols cols-6040">
     <div>
       <svg class="diagram" width="460" height="260" viewBox="0 0 460 260">
-        <text x="20" y="20" fill="#8888a8" font-family="JetBrains Mono" font-size="10">Clients</text>
-        <rect x="10" y="30" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
-        <text x="50" y="52" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">Web App</text>
-        <rect x="10" y="75" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
-        <text x="50" y="97" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">Mobile</text>
-        <rect x="10" y="120" width="80" height="35" rx="5" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
-        <text x="50" y="142" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">3rd Party</text>
+        <text x="20" y="20" fill="#9093ba" font-family="JetBrains Mono" font-size="10">Clients</text>
+        <rect x="10" y="30" width="80" height="35" rx="5" fill="#1c1f44" stroke="#93c6eb" stroke-width="1.5"/>
+        <text x="50" y="52" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="10">Web App</text>
+        <rect x="10" y="75" width="80" height="35" rx="5" fill="#1c1f44" stroke="#93c6eb" stroke-width="1.5"/>
+        <text x="50" y="97" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="10">Mobile</text>
+        <rect x="10" y="120" width="80" height="35" rx="5" fill="#1c1f44" stroke="#93c6eb" stroke-width="1.5"/>
+        <text x="50" y="142" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="10">3rd Party</text>
         <!-- Arrows to gateway -->
-        <line x1="90" y1="47" x2="150" y2="100" stroke="#2a2a3a" stroke-width="1"/>
-        <line x1="90" y1="92" x2="150" y2="105" stroke="#2a2a3a" stroke-width="1"/>
-        <line x1="90" y1="137" x2="150" y2="110" stroke="#2a2a3a" stroke-width="1"/>
+        <line x1="90" y1="47" x2="150" y2="100" stroke="#363c6c" stroke-width="1"/>
+        <line x1="90" y1="92" x2="150" y2="105" stroke="#363c6c" stroke-width="1"/>
+        <line x1="90" y1="137" x2="150" y2="110" stroke="#363c6c" stroke-width="1"/>
         <!-- API Gateway -->
-        <rect x="150" y="30" width="130" height="190" rx="8" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
-        <text x="215" y="52" text-anchor="middle" fill="#f5a623" font-family="Playfair Display" font-size="12" font-weight="700">API Gateway</text>
-        <rect x="162" y="60" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
-        <text x="215" y="75" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Auth / JWT</text>
-        <rect x="162" y="88" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
-        <text x="215" y="103" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Rate Limiting</text>
-        <rect x="162" y="116" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
-        <text x="215" y="131" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Routing</text>
-        <rect x="162" y="144" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
-        <text x="215" y="159" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Request Transform</text>
-        <rect x="162" y="172" width="106" height="22" rx="3" fill="#181824" stroke="#2a2a3a"/>
-        <text x="215" y="187" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="9">Logging</text>
+        <rect x="150" y="30" width="130" height="190" rx="8" fill="#1c1f44" stroke="#efba4d" stroke-width="2"/>
+        <text x="215" y="52" text-anchor="middle" fill="#efba4d" font-family="Playfair Display" font-size="12" font-weight="700">API Gateway</text>
+        <rect x="162" y="60" width="106" height="22" rx="3" fill="#21254d" stroke="#363c6c"/>
+        <text x="215" y="75" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="9">Auth / JWT</text>
+        <rect x="162" y="88" width="106" height="22" rx="3" fill="#21254d" stroke="#363c6c"/>
+        <text x="215" y="103" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="9">Rate Limiting</text>
+        <rect x="162" y="116" width="106" height="22" rx="3" fill="#21254d" stroke="#363c6c"/>
+        <text x="215" y="131" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="9">Routing</text>
+        <rect x="162" y="144" width="106" height="22" rx="3" fill="#21254d" stroke="#363c6c"/>
+        <text x="215" y="159" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="9">Request Transform</text>
+        <rect x="162" y="172" width="106" height="22" rx="3" fill="#21254d" stroke="#363c6c"/>
+        <text x="215" y="187" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="9">Logging</text>
         <!-- Services -->
-        <rect x="340" y="30" width="110" height="40" rx="6" fill="#10101a" stroke="#4ecb8d" stroke-width="1.5"/>
-        <text x="395" y="55" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="10">user-svc</text>
-        <rect x="340" y="80" width="110" height="40" rx="6" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
-        <text x="395" y="105" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="10">order-svc</text>
-        <rect x="340" y="130" width="110" height="40" rx="6" fill="#10101a" stroke="#a78bfa" stroke-width="1.5"/>
-        <text x="395" y="155" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10">payment-svc</text>
+        <rect x="340" y="30" width="110" height="40" rx="6" fill="#1c1f44" stroke="#9dcba3" stroke-width="1.5"/>
+        <text x="395" y="55" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="10">user-svc</text>
+        <rect x="340" y="80" width="110" height="40" rx="6" fill="#1c1f44" stroke="#93c6eb" stroke-width="1.5"/>
+        <text x="395" y="105" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="10">order-svc</text>
+        <rect x="340" y="130" width="110" height="40" rx="6" fill="#1c1f44" stroke="#c2aef4" stroke-width="1.5"/>
+        <text x="395" y="155" text-anchor="middle" fill="#c2aef4" font-family="JetBrains Mono" font-size="10">payment-svc</text>
         <!-- Arrows to services -->
-        <line x1="280" y1="80" x2="340" y2="50" stroke="#f5a623" stroke-width="1.5"/>
-        <line x1="280" y1="105" x2="340" y2="100" stroke="#f5a623" stroke-width="1.5"/>
-        <line x1="280" y1="130" x2="340" y2="150" stroke="#f5a623" stroke-width="1.5"/>
+        <line x1="280" y1="80" x2="340" y2="50" stroke="#efba4d" stroke-width="1.5"/>
+        <line x1="280" y1="105" x2="340" y2="100" stroke="#efba4d" stroke-width="1.5"/>
+        <line x1="280" y1="130" x2="340" y2="150" stroke="#efba4d" stroke-width="1.5"/>
       </svg>
       <div class="card blue" style="margin-top: .2em;">
         <h3>Gateway Options</h3>
@@ -1066,7 +1066,7 @@ app.listen(8080, () =&gt;
 </section>
 
 <!-- ============== SLIDE 14: SERVICE DISCOVERY ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">12</span>
     <h2>Service Discovery &amp; Load Balancing</h2>
@@ -1144,7 +1144,7 @@ spec:
 </section>
 
 <!-- ============== SLIDE 15: AUTHENTICATION BETWEEN SERVICES ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">13</span>
     <h2>Authentication Between Services</h2>
@@ -1240,7 +1240,7 @@ const res = await fetch(url, {
 </section>
 
 <!-- ============== SLIDE 16: LOGGING & OBSERVABILITY ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">14</span>
     <h2>Logging &amp; Observability</h2>
@@ -1329,7 +1329,7 @@ export function correlationPlugin(app: FastifyInstance) {
 </section>
 
 <!-- ============== SLIDE 17: KUBERNETES DEPLOYMENT ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">15</span>
     <h2>Deploying to Kubernetes</h2>
@@ -1435,7 +1435,7 @@ spec:
 </section>
 
 <!-- ============== SLIDE 18: AWS DEPLOYMENT ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">16</span>
     <h2>Deploying to AWS (ECS/Fargate &amp; Lambda)</h2>
@@ -1521,7 +1521,7 @@ export const handler: APIGatewayProxyHandlerV2 =
 </section>
 
 <!-- ============== SLIDE 19: CI/CD PIPELINE ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">17</span>
     <h2>CI/CD Pipeline for Microservices</h2>
@@ -1595,7 +1595,7 @@ jobs:
 </section>
 
 <!-- ============== SLIDE 20: DATABASE PER SERVICE ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">18</span>
     <h2>Database per Service</h2>
@@ -1604,38 +1604,38 @@ jobs:
     <div>
       <svg class="diagram" width="440" height="250" viewBox="0 0 440 250">
         <!-- User service -->
-        <rect x="10" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#4ecb8d" stroke-width="1.5"/>
-        <text x="75" y="40" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="11">user-service</text>
-        <line x1="75" y1="60" x2="75" y2="85" stroke="#4ecb8d" stroke-width="1.5"/>
-        <rect x="20" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#4ecb8d" stroke-width="1"/>
-        <text x="75" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
-        <text x="75" y="117" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono" font-size="8">users, profiles</text>
+        <rect x="10" y="10" width="130" height="50" rx="6" fill="#1c1f44" stroke="#9dcba3" stroke-width="1.5"/>
+        <text x="75" y="40" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="11">user-service</text>
+        <line x1="75" y1="60" x2="75" y2="85" stroke="#9dcba3" stroke-width="1.5"/>
+        <rect x="20" y="85" width="110" height="40" rx="6" fill="#21254d" stroke="#9dcba3" stroke-width="1"/>
+        <text x="75" y="103" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+        <text x="75" y="117" text-anchor="middle" fill="#9dcba3" font-family="JetBrains Mono" font-size="8">users, profiles</text>
         <!-- Order service -->
-        <rect x="160" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#60a5fa" stroke-width="1.5"/>
-        <text x="225" y="40" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="11">order-service</text>
-        <line x1="225" y1="60" x2="225" y2="85" stroke="#60a5fa" stroke-width="1.5"/>
-        <rect x="170" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#60a5fa" stroke-width="1"/>
-        <text x="225" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">MongoDB</text>
-        <text x="225" y="117" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">orders, items</text>
+        <rect x="160" y="10" width="130" height="50" rx="6" fill="#1c1f44" stroke="#93c6eb" stroke-width="1.5"/>
+        <text x="225" y="40" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="11">order-service</text>
+        <line x1="225" y1="60" x2="225" y2="85" stroke="#93c6eb" stroke-width="1.5"/>
+        <rect x="170" y="85" width="110" height="40" rx="6" fill="#21254d" stroke="#93c6eb" stroke-width="1"/>
+        <text x="225" y="103" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">MongoDB</text>
+        <text x="225" y="117" text-anchor="middle" fill="#93c6eb" font-family="JetBrains Mono" font-size="8">orders, items</text>
         <!-- Payment service -->
-        <rect x="310" y="10" width="130" height="50" rx="6" fill="#10101a" stroke="#a78bfa" stroke-width="1.5"/>
-        <text x="375" y="40" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="11">payment-svc</text>
-        <line x1="375" y1="60" x2="375" y2="85" stroke="#a78bfa" stroke-width="1.5"/>
-        <rect x="320" y="85" width="110" height="40" rx="6" fill="#181824" stroke="#a78bfa" stroke-width="1"/>
-        <text x="375" y="103" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
-        <text x="375" y="117" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">transactions</text>
+        <rect x="310" y="10" width="130" height="50" rx="6" fill="#1c1f44" stroke="#c2aef4" stroke-width="1.5"/>
+        <text x="375" y="40" text-anchor="middle" fill="#c2aef4" font-family="JetBrains Mono" font-size="11">payment-svc</text>
+        <line x1="375" y1="60" x2="375" y2="85" stroke="#c2aef4" stroke-width="1.5"/>
+        <rect x="320" y="85" width="110" height="40" rx="6" fill="#21254d" stroke="#c2aef4" stroke-width="1"/>
+        <text x="375" y="103" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">PostgreSQL</text>
+        <text x="375" y="117" text-anchor="middle" fill="#c2aef4" font-family="JetBrains Mono" font-size="8">transactions</text>
         <!-- Red X for direct DB access -->
-        <text x="150" y="105" fill="#f87171" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
-        <text x="300" y="105" fill="#f87171" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
+        <text x="150" y="105" fill="#f0846a" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
+        <text x="300" y="105" fill="#f0846a" font-family="JetBrains Mono" font-size="18" font-weight="700">&#215;</text>
         <!-- Event bus -->
-        <rect x="80" y="155" width="290" height="35" rx="6" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
-        <text x="225" y="177" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono" font-size="11">Event Bus (domain events for data sync)</text>
-        <line x1="75" y1="125" x2="140" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
-        <line x1="225" y1="125" x2="225" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
-        <line x1="375" y1="125" x2="310" y2="155" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
+        <rect x="80" y="155" width="290" height="35" rx="6" fill="#1c1f44" stroke="#efba4d" stroke-width="2"/>
+        <text x="225" y="177" text-anchor="middle" fill="#efba4d" font-family="JetBrains Mono" font-size="11">Event Bus (domain events for data sync)</text>
+        <line x1="75" y1="125" x2="140" y2="155" stroke="#efba4d" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="225" y1="125" x2="225" y2="155" stroke="#efba4d" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="375" y1="125" x2="310" y2="155" stroke="#efba4d" stroke-width="1" stroke-dasharray="4"/>
         <!-- Rule text -->
-        <text x="225" y="215" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="10">Rule: services NEVER access another service's database</text>
-        <text x="225" y="235" text-anchor="middle" fill="#8888a8" font-family="JetBrains Mono" font-size="9">Communicate via APIs or events only</text>
+        <text x="225" y="215" text-anchor="middle" fill="#f0846a" font-family="JetBrains Mono" font-size="10">Rule: services NEVER access another service's database</text>
+        <text x="225" y="235" text-anchor="middle" fill="#9093ba" font-family="JetBrains Mono" font-size="9">Communicate via APIs or events only</text>
       </svg>
     </div>
     <div>
@@ -1673,7 +1673,7 @@ jobs:
 </section>
 
 <!-- ============== SLIDE 21: COMMON PITFALLS ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">19</span>
     <h2>Common Pitfalls &amp; Production Lessons</h2>
@@ -1771,7 +1771,7 @@ const res = await fetch(url, {
 </section>
 
 <!-- ============== SLIDE 22: SUMMARY ============== -->
-<section data-background-color="#0a0a0f">
+<section data-background-color="#17193a">
   <div class="slide-hdr">
     <span class="tag">20</span>
     <h2>Summary &amp; Further Reading</h2>
